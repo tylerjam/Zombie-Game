@@ -22,7 +22,10 @@ My Zombie Map
 <div id="zombie_map"></div>
 <script>
 	var zombie_map;
-	
+	var tolerance = 10;
+	var count =0;
+	var score = 0;
+
 	var data = `-33.32685080703496 115.63235305056335 zombie.png 
 -33.32771561615748 115.63193690780734 zombie.png 
 -33.32800594691665 115.63339128859806 hospital.png 
@@ -41,15 +44,17 @@ My Zombie Map
 	
 var markers = data.split("\n");
 var all_markers=[];
-var count =0;
+
 
 	function initMap() {
 
 	zombie_map = new google.maps.Map(document.getElementById('zombie_map'), {
 	zoom: 18,
 	center: {lat: -33.327617, lng: 115.633066}
-
+	
+	
 	});
+	
 
 	if (navigator.geolocation) {
 navigator.geolocation.watchPosition(set_my_position);
@@ -75,12 +80,40 @@ old_position.setMap(null);
 var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 console.log(pos);
 
+
 var marker = new google.maps.Marker({
 		position: pos,
 		icon: "player.png",
 		map: zombie_map
 	});
-old_position.setMap(null);
+old_position = marker;
+
+for (var i=0; i<all_markers.length; i++) {
+var distance = google.maps.geometry.spherical.computeDistanceBetween(pos, all_markers[i].getPosition());
+console.log(distance);
+if (distance <tolerance){
+var what_is_it = all_markers[i].getIcon();
+what_is_it = what_is_it.replace(".png", "")
+alert("Found the "+ what_is_it);
+all_markers[i].setMap(null);
+
+if (what_is_it != "zombie") {
+score +=30;
+alert ("Your score is "+score);
+all_markers[i].setMap(null);
+console.log(count);
+}
+else {
+score -=10;
+alert ("Your score is "+score);
+console.log(count);
+}
+
+
+}
+}
+
+
 }
 
 	if (count<1) {
@@ -94,22 +127,24 @@ old_position.setMap(null);
 	var marker = new google.maps.Marker({
 	position: marker_position,
 	icon: emoji,
+	//visible: false,
 	map:zombie_map
 	});
 
 	all_markers.push(marker);
 
+
 }	
 count++;
 
-}
+}		
 }
 </script>
 
 
 
 <script async defer
-	src ="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKvY1zxx5_azVEWKnfgqEb_wD8DPwvsVY&callback=initMap">
+	src ="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKvY1zxx5_azVEWKnfgqEb_wD8DPwvsVY&callback=initMap&libraries=geometry">
 </script>
 
 
